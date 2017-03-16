@@ -9,4 +9,10 @@
         android:persistent="true"
         android:summary="Activate/deactivate plugin" />
 
+    <CheckBoxPreference
+        android:key="estimote_nearable"
+        android:defaultValue="false"
+        android:persistent="true"
+        android:summary="Activate/deactivate nearable" />
+
 </PreferenceScreen>

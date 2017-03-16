@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.aware.plugin.estimote">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -13,7 +18,7 @@
         <service
             android:name="com.aware.plugin.estimote.Plugin"
             android:exported="true"
-            android:label="AWARE: Plugin Template" />
+            android:label="AWARE: Estimote" />
 
         <activity
             android:name="com.aware.plugin.estimote.Settings"
@@ -22,7 +27,7 @@
         <!-- Keep the ${applicationId} so there are no conflicts when merging this plugin as a library for reuse -->
         <provider
             android:name="com.aware.plugin.estimote.Provider"
-            android:authorities="${applicationId}.provider.xxx"
+            android:authorities="${applicationId}.provider.estimote"
             android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
