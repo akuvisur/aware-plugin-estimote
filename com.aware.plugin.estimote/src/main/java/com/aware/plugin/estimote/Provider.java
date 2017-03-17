@@ -75,7 +75,7 @@ public class Provider extends ContentProvider {
         Estimote_Data.X_ACCELERATION + " text default ''," +
         Estimote_Data.Y_ACCELERATION + " text default ''," +
         Estimote_Data.Z_ACCELERATION + " text default ''," +
-        Estimote_Data.IS_MOVING + " text default";
+        Estimote_Data.IS_MOVING + " text default ''";
 
     /**
      * Share the fields with AWARE so we can replicate the table schema on the server
