@@ -17,13 +17,22 @@ import com.estimote.sdk.telemetry.EstimoteTelemetry;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.Math.round;
-
 public class Plugin extends Aware_Plugin {
 
     private String mScanID;
+    private String mEstimoteID;
     private BeaconManager mBeaconManager;
-    private List<String> mArrayStickers = Arrays.asList("4493eef642ecd8bd", "ef71c3d5da7eb884");
+
+    // Nearable List:
+    // Blue - Shoe - be13971311515b72
+    // Blue - Door - dd882f70252e1ee4
+    // Green - Bag - 31812b2646a7e655
+    // Purple - Dog - ef71c3d5da7eb884
+    // Yellow - Chair - 9d3dd0f95e0ea304
+    // Pink - Bed - fc9202bbbcb48a8f
+
+    private List<String> mArrayStickers = Arrays.asList("be13971311515b72", "dd882f70252e1ee4", "31812b2646a7e655",
+                                                        "ef71c3d5da7eb884", "9d3dd0f95e0ea304", "fc9202bbbcb48a8f");
 
     @Override
     public void onCreate() {
@@ -57,20 +66,27 @@ public class Plugin extends Aware_Plugin {
 
         EstimoteSDK.initialize(this, "care-estimotes-b0n", "6a749930b80298c5dbb16af6c9709da6");
         mBeaconManager = new BeaconManager(getApplicationContext());
-        mBeaconManager.setForegroundScanPeriod(800, 0);
-        mBeaconManager.setBackgroundScanPeriod(800,0);
-       // mBeaconManager.
+        mBeaconManager.setForegroundScanPeriod(100,0);
+        mBeaconManager.setBackgroundScanPeriod(100,0);
         mBeaconManager.setNearableListener(new BeaconManager.NearableListener() {
             @Override
             public void onNearablesDiscovered(List<Nearable> list) {
                 for (Nearable nearable : list) {
 
                     if (mArrayStickers.contains(nearable.identifier)) {
-                    Log.d("ABC 11", "Packet Found !!!");
+
+                        if(nearable.identifier.equals("be13971311515b72")) { mEstimoteID = "blue_shoe"; }
+                        else if(nearable.identifier.equals("dd882f70252e1ee4")) { mEstimoteID = "blue_door"; }
+                        else if(nearable.identifier.equals("31812b2646a7e655")) { mEstimoteID = "green_bag"; }
+                        else if(nearable.identifier.equals("ef71c3d5da7eb884")) { mEstimoteID = "purple_dog"; }
+                        else if(nearable.identifier.equals("9d3dd0f95e0ea304")) { mEstimoteID = "yellow_chair"; }
+                        else { mEstimoteID = "pink_bed"; } //fc9202bbbcb48a8f
+
                         ContentValues estimoteData = new ContentValues();
                         estimoteData.put(Provider.Estimote_Data.TIMESTAMP, System.currentTimeMillis());
                         estimoteData.put(Provider.Estimote_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
                         estimoteData.put(Provider.Estimote_Data.ESTIMOTE_ID, nearable.identifier);
+                        estimoteData.put(Provider.Estimote_Data.ESTIMOTE_APPEARANCE, mEstimoteID);
                         estimoteData.put(Provider.Estimote_Data.ESTIMOTE_BATTERY, nearable.batteryLevel.toString());
                         estimoteData.put(Provider.Estimote_Data.TEMPERATURE, Double.toString(nearable.temperature));
                         estimoteData.put(Provider.Estimote_Data.X_ACCELERATION, Double.toString(nearable.xAcceleration));
@@ -78,28 +94,6 @@ public class Plugin extends Aware_Plugin {
                         estimoteData.put(Provider.Estimote_Data.Z_ACCELERATION, Double.toString(nearable.zAcceleration));
                         estimoteData.put(Provider.Estimote_Data.IS_MOVING, Boolean.toString(nearable.isMoving));
                         getContentResolver().insert(Provider.Estimote_Data.CONTENT_URI, estimoteData);
-                    }
-                }
-            }
-        });
-
-
-        mBeaconManager.setTelemetryListener(new BeaconManager.TelemetryListener() {
-            @Override
-            public void onTelemetriesFound(List<EstimoteTelemetry> telemetries) {
-                for (EstimoteTelemetry tlm : telemetries) {
-                    Log.d("ABC 22", "Beacon !!!");
-
-                    //Log.d("TELEMETRY", "beaconID: " + tlm.deviceId +
-                      //    ", temperature: " + tlm.temperature + " °C");
-                                                     //  934d0df6aca78dcd75b02d8ee9a0d814
-                    if(tlm.deviceId.toString().equals("[934d0df6aca78dcd75b02d8ee9a0d814]")) {
-                        Log.d("TELEMETRY",
-                                "Beacon ID : " + tlm.deviceId +
-                                ", Temperature : " + tlm.temperature + " °C" +
-                                ", Accelerometer : " + tlm.accelerometer +
-                                ", Lux : " + tlm.ambientLight +
-                                ", Motion state: " +  tlm.motionState);
                     }
                 }
             }
@@ -121,8 +115,7 @@ public class Plugin extends Aware_Plugin {
             // Should be invoked in #onStart.
             mBeaconManager.connect(new BeaconManager.ServiceReadyCallback() {
                 @Override public void onServiceReady() {
-                    mScanID = mBeaconManager.startTelemetryDiscovery();
-                    //mScanID = mBeaconManager.startNearableDiscovery();
+                    mScanID = mBeaconManager.startNearableDiscovery();
                 }
             });
 
@@ -130,7 +123,6 @@ public class Plugin extends Aware_Plugin {
             Aware.startPlugin(this, "com.aware.plugin.estimote");
             Aware.startAWARE(this);
         }
-
         return START_STICKY;
     }
 

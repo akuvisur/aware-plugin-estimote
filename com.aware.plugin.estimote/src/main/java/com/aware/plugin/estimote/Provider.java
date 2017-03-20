@@ -23,7 +23,7 @@ public class Provider extends ContentProvider {
 
     public static String AUTHORITY = "com.aware.plugin.estimote.provider.estimote"; //change to package.provider.your_plugin_name
 
-    public static final int DATABASE_VERSION = 6; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 7; //increase this if you make changes to the database structure, i.e., rename columns, etc.
     public static final String DATABASE_NAME = "plugin_estimote.db"; //the database filename, use plugin_xxx for plugins.
 
     //Add here your database table names, as many as you need
@@ -56,6 +56,7 @@ public class Provider extends ContentProvider {
 
         //Note: integers and strings don't need a type prefix_
         public static final String ESTIMOTE_ID = "estimote_id";
+        public static final String ESTIMOTE_APPEARANCE = "estimote_appearance";
         public static final String ESTIMOTE_BATTERY = "estimote_battery";
         public static final String TEMPERATURE = "temperature";
         public static final String X_ACCELERATION = "x_acceleration";
@@ -69,6 +70,7 @@ public class Provider extends ContentProvider {
         Estimote_Data._ID + " integer primary key autoincrement," +
         Estimote_Data.TIMESTAMP + " real default 0," +
         Estimote_Data.DEVICE_ID + " text default ''," +
+        Estimote_Data.ESTIMOTE_APPEARANCE + " text default ''," +
         Estimote_Data.ESTIMOTE_ID + " text default ''," +
         Estimote_Data.ESTIMOTE_BATTERY + " text default ''," +
         Estimote_Data.TEMPERATURE + " text default ''," +
@@ -89,12 +91,9 @@ public class Provider extends ContentProvider {
     private DatabaseHelper dbHelper;
     private static SQLiteDatabase database;
     private void initialiseDatabase() {
-        Log.d("AWW", "AWW 1");
         if (dbHelper == null)
-            Log.d("AWW", "AWW 2");
         dbHelper = new DatabaseHelper(getContext(), DATABASE_NAME, null, DATABASE_VERSION, DATABASE_TABLES, TABLES_FIELDS);
         if (database == null)
-            Log.d("AWW", "AWW 3");
         database = dbHelper.getWritableDatabase();
     }
     //--
@@ -119,6 +118,7 @@ public class Provider extends ContentProvider {
         estimoteHash.put(Estimote_Data.TIMESTAMP, Estimote_Data.TIMESTAMP);
         estimoteHash.put(Estimote_Data.DEVICE_ID, Estimote_Data.DEVICE_ID);
         estimoteHash.put(Estimote_Data.ESTIMOTE_ID, Estimote_Data.ESTIMOTE_ID);
+        estimoteHash.put(Estimote_Data.ESTIMOTE_APPEARANCE, Estimote_Data.ESTIMOTE_APPEARANCE);
         estimoteHash.put(Estimote_Data.ESTIMOTE_BATTERY, Estimote_Data.ESTIMOTE_BATTERY);
         estimoteHash.put(Estimote_Data.TEMPERATURE, Estimote_Data.TEMPERATURE);
         estimoteHash.put(Estimote_Data.X_ACCELERATION, Estimote_Data.X_ACCELERATION);
