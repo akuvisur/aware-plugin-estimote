@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.utils.Aware_Plugin;
@@ -118,6 +119,9 @@ public class Plugin extends Aware_Plugin {
                     mScanID = mBeaconManager.startNearableDiscovery();
                 }
             });
+
+            Applications.isAccessibilityServiceActive(getApplicationContext());
+            if (!Aware.isStudy(this)) Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1168/t9dqX3BWpbX9");
 
             //Initialise AWARE instance in plugin
             Aware.startPlugin(this, "com.aware.plugin.estimote");
