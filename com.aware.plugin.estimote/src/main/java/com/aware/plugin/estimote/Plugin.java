@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 import com.aware.Applications;
 import com.aware.Aware;
@@ -13,7 +12,6 @@ import com.aware.utils.Aware_Plugin;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.EstimoteSDK;
 import com.estimote.sdk.Nearable;
-import com.estimote.sdk.telemetry.EstimoteTelemetry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -111,7 +109,7 @@ public class Plugin extends Aware_Plugin {
             DEBUG = Aware.getSetting(this, Aware_Preferences.DEBUG_FLAG).equals("true");
 
             //Initialize our plugin's settings
-            Aware.setSetting(this, Settings.STATUS_PLUGIN_TEMPLATE, true);
+            Aware.setSetting(this, Settings.STATUS_PLUGIN_ESTIMOTE, true);
 
             // Should be invoked in #onStart.
             mBeaconManager.connect(new BeaconManager.ServiceReadyCallback() {
@@ -121,7 +119,7 @@ public class Plugin extends Aware_Plugin {
             });
 
             Applications.isAccessibilityServiceActive(getApplicationContext());
-            if (!Aware.isStudy(this)) Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1168/t9dqX3BWpbX9");
+            if (!Aware.isStudy(this)) Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1172/J3msPlz1wsCb");
 
             //Initialise AWARE instance in plugin
             Aware.startPlugin(this, "com.aware.plugin.estimote");
@@ -135,7 +133,7 @@ public class Plugin extends Aware_Plugin {
         super.onDestroy();
 
         mBeaconManager.disconnect();
-        Aware.setSetting(this, Settings.STATUS_PLUGIN_TEMPLATE, false);
+        Aware.setSetting(this, Settings.STATUS_PLUGIN_ESTIMOTE, false);
 
         //Stop AWARE instance in plugin
         Aware.stopAWARE(this);
