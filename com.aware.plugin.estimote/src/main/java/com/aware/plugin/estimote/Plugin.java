@@ -1,9 +1,11 @@
 package com.aware.plugin.estimote;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.aware.Applications;
@@ -18,6 +20,8 @@ import com.estimote.sdk.telemetry.EstimoteTelemetry;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.estimote.sdk.Utils.computeProximity;
+
 public class Plugin extends Aware_Plugin {
 
     private String mScanID;
@@ -28,7 +32,9 @@ public class Plugin extends Aware_Plugin {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.BLUETOOTH,
-            Manifest.permission.BLUETOOTH_ADMIN
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
 
     // Nearable List:
@@ -44,6 +50,8 @@ public class Plugin extends Aware_Plugin {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Log.d(TAG, "Started estimote plugin");
 
         TAG = "AWARE::"+getResources().getString(R.string.app_name);
 
@@ -67,6 +75,7 @@ public class Plugin extends Aware_Plugin {
         REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH_ADMIN);
         REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_COARSE_LOCATION);
         REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_SYNC_SETTINGS);
 
         mBeaconManager = new BeaconManager(getApplicationContext());
         mBeaconManager.setForegroundScanPeriod(500,0);
@@ -93,6 +102,8 @@ public class Plugin extends Aware_Plugin {
                         nearableData.put(Provider.Nearable_Data.Y_ACCELERATION, Double.toString(nearable.yAcceleration));
                         nearableData.put(Provider.Nearable_Data.Z_ACCELERATION, Double.toString(nearable.zAcceleration));
                         nearableData.put(Provider.Nearable_Data.IS_MOVING, Boolean.toString(nearable.isMoving));
+                        nearableData.put(Provider.Nearable_Data.RSSI, Double.toString(nearable.rssi));
+                        nearableData.put(Provider.Nearable_Data.COMPUTED_PROXIMITY, String.valueOf(computeProximity(nearable)));
                         getContentResolver().insert(Provider.Nearable_Data.CONTENT_URI, nearableData);
                     }
                 }
@@ -106,7 +117,7 @@ public class Plugin extends Aware_Plugin {
                     telemetryData.put(Provider.Telemetry_Data.TIMESTAMP, System.currentTimeMillis());
                     telemetryData.put(Provider.Telemetry_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
                     telemetryData.put(Provider.Telemetry_Data.ESTIMOTE_ID, String.valueOf(tlm.deviceId));
-                    telemetryData.put(Provider.Telemetry_Data.ESTIMOTE_APPEARANCE, "Bacon!");
+                    telemetryData.put(Provider.Telemetry_Data.ESTIMOTE_APPEARANCE, "");
                     telemetryData.put(Provider.Telemetry_Data.ESTIMOTE_BATTERY, tlm.batteryPercentage.toString());
                     telemetryData.put(Provider.Telemetry_Data.TEMPERATURE, Double.toString(tlm.temperature));
                     telemetryData.put(Provider.Telemetry_Data.AMBIENT_LIGHT, tlm.ambientLight);
@@ -130,7 +141,7 @@ public class Plugin extends Aware_Plugin {
     //This function gets called every 5 minutes by AWARE to make sure this plugin is still running.
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //super.onStartCommand(intent, flags, startId);
+        super.onStartCommand(intent, flags, startId);
 
         Aware.setSetting(this, Settings.STATUS_PLUGIN_ESTIMOTE, true);
         DEBUG = Aware.getSetting(this, Aware_Preferences.DEBUG_FLAG).equals("true");
@@ -148,7 +159,28 @@ public class Plugin extends Aware_Plugin {
         if (!Aware.isStudy(this)) Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1172/J3msPlz1wsCb");
 
         //Initialise AWARE instance in plugin
-        Aware.startAWARE(this);
+        if (PERMISSIONS_OK) {
+
+            DEBUG = Aware.getSetting(this, Aware_Preferences.DEBUG_FLAG).equals("true");
+
+            //Initialize our plugin's settings
+            Aware.setSetting(this, Settings.STATUS_PLUGIN_ESTIMOTE, true);
+
+            //Enable our plugin's sync-adapter to upload the data to the server if part of a study
+            if (Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE).length() >= 0 && !Aware.isSyncEnabled(this, Provider.getAuthority(this)) && Aware.isStudy(this) && getApplicationContext().getPackageName().equalsIgnoreCase("com.aware.phone") || getApplicationContext().getResources().getBoolean(R.bool.standalone)) {
+                ContentResolver.setIsSyncable(Aware.getAWAREAccount(this), Provider.getAuthority(this), 1);
+                ContentResolver.setSyncAutomatically(Aware.getAWAREAccount(this), Provider.getAuthority(this), true);
+                ContentResolver.addPeriodicSync(
+                        Aware.getAWAREAccount(this),
+                        Provider.getAuthority(this),
+                        Bundle.EMPTY,
+                        Long.parseLong(Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60
+                );
+            }
+
+            //Initialise AWARE instance in plugin
+            Aware.startAWARE(this);
+        }
 
         return START_STICKY;
     }

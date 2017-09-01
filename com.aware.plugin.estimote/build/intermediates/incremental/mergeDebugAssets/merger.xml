@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="/Users/aku/StudioProjects/aware-plugin-estimote/com.aware.plugin.estimote/src/main/assets"/><source path="/Users/aku/StudioProjects/aware-plugin-estimote/com.aware.plugin.estimote/build/generated/assets/shaders/debug"/></dataSet><dataSet config="debug"><source path="/Users/aku/StudioProjects/aware-plugin-estimote/com.aware.plugin.estimote/src/debug/assets"/></dataSet></merger>

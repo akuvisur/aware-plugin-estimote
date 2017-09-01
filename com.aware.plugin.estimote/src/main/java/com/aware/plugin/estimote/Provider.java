@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -67,6 +68,8 @@ public class Provider extends ContentProvider {
         public static final String Y_ACCELERATION = "y_acceleration";
         public static final String Z_ACCELERATION = "z_acceleration";
         public static final String IS_MOVING = "is_moving";
+        public static final String RSSI = "rssi";
+        public static final String COMPUTED_PROXIMITY = "computed_proximity";
     }
 
     public static final class Telemetry_Data implements AWAREColumns {
@@ -98,7 +101,9 @@ public class Provider extends ContentProvider {
         Nearable_Data.X_ACCELERATION + " text default ''," +
         Nearable_Data.Y_ACCELERATION + " text default ''," +
         Nearable_Data.Z_ACCELERATION + " text default ''," +
-        Nearable_Data.IS_MOVING + " text default ''";
+        Nearable_Data.IS_MOVING + " text default ''," +
+        Nearable_Data.COMPUTED_PROXIMITY + " text default ''," +
+        Nearable_Data.RSSI + " text default ''";
 
     //Define each database table fields
     private static final String DB_TBL_TELEMETRY_FIELDS =
@@ -135,6 +140,11 @@ public class Provider extends ContentProvider {
     }
     //--
 
+    public static String getAuthority(Context context) {
+        AUTHORITY = context.getPackageName() + ".provider.estimote";
+        return AUTHORITY;
+    }
+
     //For each table, create a hashmap needed for database queries
     private HashMap<String, String> nearableHash;
     private HashMap<String, String> telemetryHash;
@@ -166,6 +176,8 @@ public class Provider extends ContentProvider {
         nearableHash.put(Nearable_Data.Y_ACCELERATION, Nearable_Data.Y_ACCELERATION);
         nearableHash.put(Nearable_Data.Z_ACCELERATION, Nearable_Data.Z_ACCELERATION);
         nearableHash.put(Nearable_Data.IS_MOVING, Nearable_Data.IS_MOVING);
+        nearableHash.put(Nearable_Data.RSSI, Nearable_Data.RSSI);
+        nearableHash.put(Nearable_Data.COMPUTED_PROXIMITY, Nearable_Data.COMPUTED_PROXIMITY);
 
         telemetryHash = new HashMap<>();
         telemetryHash.put(Telemetry_Data._ID, Telemetry_Data._ID);

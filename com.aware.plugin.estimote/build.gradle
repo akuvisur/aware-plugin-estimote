@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0-beta2"
 
     defaultConfig {
         applicationId "com.aware.plugin.estimote" //EDIT ME
-        minSdkVersion 11
-        targetSdkVersion 25
+        minSdkVersion minimum_sdk
+        targetSdkVersion target_sdk
         versionCode version_code
         versionName version_readable
     }
@@ -49,7 +49,8 @@ configurations.all {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.android.support:appcompat-v7:$support_libs"
     compile "com.github.denzilferreira:aware-client:$aware_libs"
-    compile 'com.estimote:sdk:0.11.1@aar'
+    compile "com.android.support:appcompat-v7:$support_libs"
+    compile "com.android.support:gridlayout-v7:$support_libs"
+    compile "com.estimote:sdk:0.11.1@aar"
 }

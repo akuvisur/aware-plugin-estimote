@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.aware.plugin.estimote"
+    android:versionCode="700"
+    android:versionName="4.0.700.selfie" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="26" />
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="com.aware.READ_CONTEXT_DATA" />
+    <uses-permission android:name="com.aware.WRITE_CONTEXT_DATA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Support for Sync Adapters -->
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission
+        android:name="android.permission.AUTHENTICATE_ACCOUNTS"
+        android:maxSdkVersion="22" />
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS"
+        android:maxSdkVersion="22" /> <!-- Permissions to safeguard data collection quality -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- Needed for Bluetooth scanning on Android M and above. -->
+    <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
+
+    <application
+        android:debuggable="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/aware_ssl_config"
+        android:testOnly="true" >
+
+        <!--
+        Use a hardcoded label string on the service
+        to keep the name of the original plugin if added as a library to another
+        -->
+        <service
+            android:name="com.aware.plugin.estimote.Plugin"
+            android:exported="true"
+            android:label="AWARE: Estimote" />
+
+        <activity
+            android:name="com.aware.plugin.estimote.Settings"
+            android:exported="true" />
+
+        <!-- Keep the ${applicationId} so there are no conflicts when merging this plugin as a library for reuse -->
+        <provider
+            android:name="com.aware.plugin.estimote.Provider"
+            android:authorities="com.aware.plugin.estimote.provider.estimote"
+            android:exported="true"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+
+        <service
+            android:name="com.aware.plugin.estimote.syncadapters.Template_Sync.Template_Sync"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_template" />
+        </service>
+        <!-- Activities -->
+        <activity
+            android:name="com.aware.ui.ESM_Queue"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:theme="@style/Theme.AppCompat.Translucent" />
+        <activity
+            android:name="com.aware.ui.PermissionsHandler"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.AppCompat.Translucent" /> <!-- AWARE account service -->
+        <service android:name="com.aware.utils.Aware_Accounts" >
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/aware_authenticator" />
+        </service> <!-- Sensor services -->
+        <service
+            android:name="com.aware.Keyboard"
+            android:exported="true" />
+        <service
+            android:name="com.aware.utils.Scheduler"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Aware"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Aware$JoinStudy"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Applications"
+            android:enabled="@bool/accessibility_access"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+
+                <category android:name="android.accessibilityservice.category.FEEDBACK_GENERIC" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/aware_accessibility_config" />
+        </service>
+        <service
+            android:name="com.aware.Applications$BackgroundService"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Locations"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Bluetooth"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Screen"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Battery"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Network"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Communication"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Processor"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Timezone"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Mqtt"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Traffic"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Accelerometer"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Gyroscope"
+            android:exported="true" />
+        <service
+            android:name="com.aware.WiFi"
+            android:exported="true" />
+        <service
+            android:name="com.aware.WiFi$BackgroundService"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Telephony"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Rotation"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Light"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Proximity"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Magnetometer"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Barometer"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Gravity"
+            android:exported="true" />
+        <service
+            android:name="com.aware.LinearAccelerometer"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Temperature"
+            android:exported="true" />
+        <service
+            android:name="com.aware.ESM"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Installations"
+            android:exported="true" />
+        <service
+            android:name="com.aware.utils.WebserviceHelper"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="ACTION_AWARE_WEBSERVICE_SYNC_TABLE" />
+                <action android:name="ACTION_AWARE_WEBSERVICE_CLEAR_TABLE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.aware.utils.DownloadPluginService"
+            android:exported="true" />
+        <service
+            android:name="com.aware.utils.StudyUtils"
+            android:exported="true" />
+        <service
+            android:name="com.aware.utils.Aware_TTS"
+            android:exported="true" />
+        <service
+            android:name="com.aware.SignificantMotion"
+            android:exported="true" /> <!-- Shared BroadcastReceivers -->
+        <receiver
+            android:name="com.aware.utils.Aware_TTS$Aware_TTS_Receiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="ACTION_AWARE_TTS_SPEAK" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.aware.Aware$Storage_Broadcaster"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+                <action android:name="android.intent.action.MEDIA_UNMOUNTED" />
+
+                <data android:scheme="file" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.aware.ESM$ESMMonitor"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="ACTION_AWARE_TRY_ESM" />
+                <action android:name="ACTION_AWARE_QUEUE_ESM" />
+                <action android:name="ACTION_AWARE_ESM_ANSWERED" />
+                <action android:name="ACTION_AWARE_ESM_DISMISSED" />
+                <action android:name="ACTION_AWARE_ESM_EXPIRED" />
+                <action android:name="ACTION_AWARE_ESM_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.aware.Aware$AwareBoot"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.aware.Aware$Aware_Broadcaster"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="ACTION_AWARE_CLEAR_DATA" />
+                <action android:name="ACTION_AWARE_SYNC_DATA" />
+                <action android:name="ACTION_QUIT_STUDY" />
+            </intent-filter>
+        </receiver> <!-- Core providers -->
+        <provider
+            android:name="com.aware.providers.Scheduler_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.scheduler"
+            android:exported="true"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Bluetooth_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.bluetooth"
+            android:exported="true"
+            android:label="@string/sensor_bluetooth"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Applications_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.applications"
+            android:exported="true"
+            android:label="@string/sensor_applications"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Locations_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.locations"
+            android:exported="true"
+            android:label="@string/sensor_locations"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Installations_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.installations"
+            android:exported="true"
+            android:label="@string/sensor_installations"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.ESM_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.esm"
+            android:exported="true"
+            android:label="@string/sensor_esms"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Temperature_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.temperature"
+            android:exported="true"
+            android:label="@string/sensor_temperature"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Linear_Accelerometer_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.accelerometer.linear"
+            android:exported="true"
+            android:label="@string/sensor_linear_accelerometer"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Gravity_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.gravity"
+            android:exported="true"
+            android:label="@string/sensor_gravity"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Barometer_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.barometer"
+            android:exported="true"
+            android:label="Barometer"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Magnetometer_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.magnetometer"
+            android:exported="true"
+            android:label="@string/sensor_magnetometer"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Proximity_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.proximity"
+            android:exported="true"
+            android:label="@string/sensor_proximity"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Light_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.light"
+            android:exported="true"
+            android:label="@string/sensor_light"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Telephony_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.telephony"
+            android:exported="true"
+            android:label="@string/sensor_telephony"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Aware_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.aware"
+            android:exported="true"
+            android:label="@string/sensor_aware"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Rotation_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.rotation"
+            android:exported="true"
+            android:label="@string/sensor_rotation"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.WiFi_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.wifi"
+            android:exported="true"
+            android:label="@string/sensor_wifi"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Accelerometer_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.accelerometer"
+            android:exported="true"
+            android:label="@string/sensor_accelerometer"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Gyroscope_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.gyroscope"
+            android:exported="true"
+            android:label="@string/sensor_gyroscope"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Traffic_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.traffic"
+            android:exported="true"
+            android:label="@string/sensor_traffic"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Mqtt_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.mqtt"
+            android:exported="true"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Processor_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.processor"
+            android:exported="true"
+            android:label="@string/sensor_processor"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.TimeZone_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.timezone"
+            android:exported="true"
+            android:label="@string/sensor_timezone"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Battery_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.battery"
+            android:exported="true"
+            android:label="@string/sensor_battery"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Screen_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.screen"
+            android:exported="true"
+            android:label="@string/sensor_screen"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Network_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.network"
+            android:exported="true"
+            android:label="@string/sensor_network_usage"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Communication_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.communication"
+            android:exported="true"
+            android:label="@string/sensor_communications"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Keyboard_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.keyboard"
+            android:exported="true"
+            android:label="@string/sensor_keyboard"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="com.aware.providers.Significant_Provider"
+            android:authorities="com.aware.plugin.estimote.provider.significant"
+            android:exported="true"
+            android:label="@string/sensor_significant"
+            android:readPermission="com.aware.READ_CONTEXT_DATA"
+            android:syncable="true"
+            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.aware.plugin.estimote.provider.storage"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <meta-data
+            android:name="android.support.VERSION"
+            android:value="26.0.2" />
+
+        <service
+            android:name="com.estimote.sdk.service.BeaconService"
+            android:exported="false" />
+        <service android:name="com.estimote.sdk.repackaged.dfu_v0_6_1.no.nordicsemi.android.dfu.DfuBaseService" />
+
+        <activity
+            android:name="com.estimote.sdk.DefaultRequirementsCheckerCallback$Activity"
+            android:theme="@style/Theme.Transparent" />
+
+        <receiver android:name="com.estimote.sdk.service.BeaconService$ScanAlarmBroadcastReceiver" />
+
+        <service
+            android:name="com.estimote.sdk.connection.internal.DeviceConnectionProviderService"
+            android:exported="false" />
+    </application>
+
+</manifest>
